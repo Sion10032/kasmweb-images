@@ -1,0 +1,19 @@
+#!/bin/sh
+# Openbox 自启脚本：桌面环境启动后由 openbox-session 调用
+
+# 双向同步 PRIMARY <-> CLIPBOARD，使剪贴板在 VNC 内外同步
+# （xterm 用 PRIMARY，Qt/GTK 应用如 QQ 用 CLIPBOARD，需要桥接）
+autocutsel -fork
+autocutsel -selection PRIMARY -fork
+
+# 关闭屏保与 DPMS
+xset s off 2>/dev/null
+xset -dpms 2>/dev/null
+
+# 应用自启钩子：应用镜像提供 /dockerstartup/app_autostart.sh
+# 若存在则启动应用，否则启动一个 xterm 作为占位
+if [ -x /dockerstartup/app_autostart.sh ]; then
+    /dockerstartup/app_autostart.sh &
+else
+    xterm &
+fi

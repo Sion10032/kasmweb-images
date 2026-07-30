@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Openbox 基础右键菜单（应用镜像可覆盖以加入自己的菜单项） -->
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+  <menu id="root-menu" label="Openbox">
+    <item label="Terminal">
+      <action name="Execute"><command>xterm</command></action>
+    </item>
+    <separator />
+    <item label="Reload Openbox">
+      <action name="Reconfigure" />
+    </item>
+    <item label="Restart Openbox">
+      <action name="Restart" />
+    </item>
+    <separator />
+    <item label="Exit">
+      <action name="Exit" />
+    </item>
+  </menu>
+</openbox_menu>

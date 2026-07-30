@@ -1,0 +1,8 @@
+# 尝试将用户名设置为 kasm 用户名
+USERNAME=${KASM_USER:-default}
+# 使用户名符合 posix 规范
+USERNAME=$(echo "$USERNAME" | sed -r 's#[^a-zA-Z0-9\._\-]#_#g')
+if ! echo "$USERNAME" | grep -qP "^[a-zA-Z0-9_\.][a-zA-Z0-9_\-\.]*"; then
+    USERNAME="default"
+fi
+export PS1="$USERNAME:\w\$ "
