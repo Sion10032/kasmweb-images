@@ -4,7 +4,13 @@
 # 双向同步 PRIMARY <-> CLIPBOARD，使剪贴板在 VNC 内外同步
 # （xterm 用 PRIMARY，Qt/GTK 应用如 QQ 用 CLIPBOARD，需要桥接）
 autocutsel -fork
+# 同步 CLIPBOARD 到 PRIMARY
 autocutsel -selection PRIMARY -fork
+
+# 轻量 topbar：任务栏 + 系统托盘（QQ 最小化恢复）+ 时钟
+# tint2 原生支持 XEmbed 与 SNI 两种托盘协议，无需 snixembed
+# （trixie 仓库无 snixembed 包，sid 才有）
+tint2 2>/dev/null &
 
 # 关闭屏保与 DPMS
 xset s off 2>/dev/null
