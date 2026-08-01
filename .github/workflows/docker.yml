@@ -16,7 +16,7 @@ env:
   QQ_IMAGE: ghcr.io/sion10032/kasmweb/qq
 
 jobs:
-  base:
+  debian-trixie-core:
     if: startsWith(github.ref_name, 'debian-trixie-core-')
     runs-on: ubuntu-latest
     steps:
