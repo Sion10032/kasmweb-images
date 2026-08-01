@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # args:
+      #   APT_MIRROR: mirrors.ustc.edu.cn
     image: ghcr.io/sion10032/kasmweb/debian-trixie-core:latest
     container_name: kasm-base
     ports:

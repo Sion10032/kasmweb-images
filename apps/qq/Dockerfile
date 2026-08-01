@@ -9,6 +9,14 @@ LABEL org.opencontainers.image.version="${VERSION}" \
 
 USER root
 
+### 镜像源（可选：设置 APT_MIRROR 才启用，如 APT_MIRROR=mirrors.ustc.edu.cn）
+# base 镜像可能用官方源构建（如 GHCR），qq 本地构建时可重新指定
+ARG APT_MIRROR=
+RUN if [ -n "$APT_MIRROR" ]; then \
+      sed -i "s|deb.debian.org|$APT_MIRROR|g" /etc/apt/sources.list.d/debian.sources && \
+      sed -i "s|security.debian.org/debian-security|$APT_MIRROR/debian-security|g" /etc/apt/sources.list.d/debian.sources; \
+    fi
+
 ### 安装 QQ
 COPY install_qq.sh /tmp/install_qq.sh
 RUN bash /tmp/install_qq.sh && rm /tmp/install_qq.sh && rm -rf /var/lib/apt/lists/*

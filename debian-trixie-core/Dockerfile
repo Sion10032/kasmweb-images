@@ -30,10 +30,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /home/kasm-default-profile
 
-### 切换 USTC 镜像源（trixie 使用 debian.sources）
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources && \
-    sed -i 's|security.debian.org/debian-security|mirrors.ustc.edu.cn/debian-security|g' \
-        /etc/apt/sources.list.d/debian.sources
+### 镜像源（可选：设置 APT_MIRROR 才启用，如 APT_MIRROR=mirrors.ustc.edu.cn）
+ARG APT_MIRROR=
+RUN if [ -n "$APT_MIRROR" ]; then \
+      sed -i "s|deb.debian.org|$APT_MIRROR|g" /etc/apt/sources.list.d/debian.sources && \
+      sed -i "s|security.debian.org/debian-security|$APT_MIRROR/debian-security|g" /etc/apt/sources.list.d/debian.sources; \
+    fi
 
 ### 基础工具 + locale + 时区
 RUN apt-get update && \
