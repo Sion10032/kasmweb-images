@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # KasmVNC + Openbox 通用基础镜像（debian 13 trixie）
 # 应用镜像基于此构建，只需提供 /dockerstartup/app_autostart.sh
 FROM debian:trixie-slim
@@ -76,11 +77,18 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 ### MiSans VF 字体（小米官方，可变字体）
-RUN mkdir -p /usr/share/fonts/truetype/misans && \
-    curl -fL "https://hyperos.mi.com/font-download/MiSans.zip" -o /tmp/MiSans.zip && \
-    unzip -o /tmp/MiSans.zip -d /tmp/misans && \
-    find /tmp/misans -name "MiSansVF.ttf" -exec cp {} /usr/share/fonts/truetype/misans/ \; && \
-    rm -rf /tmp/MiSans.zip /tmp/misans && \
+# cache mount 缓存 217M zip：首次下载慢，后续构建命中缓存秒过
+# --http1.1 避免 HTTP/2 PROTOCOL_ERROR；--retry 抗中断；unzip -t 防损坏缓存
+RUN --mount=type=cache,target=/tmp/misans-cache \
+    mkdir -p /usr/share/fonts/truetype/misans && \
+    if [ ! -s /tmp/misans-cache/MiSans.zip ] || ! unzip -tq /tmp/misans-cache/MiSans.zip >/dev/null 2>&1; then \
+      curl -fL --http1.1 --retry 5 --retry-delay 5 --retry-all-errors \
+        "https://hyperos.mi.com/font-download/MiSans.zip" \
+        -o /tmp/misans-cache/MiSans.zip; \
+    fi && \
+    unzip -o /tmp/misans-cache/MiSans.zip -d /tmp/misans-extract && \
+    find /tmp/misans-extract -name "MiSansVF.ttf" -exec cp {} /usr/share/fonts/truetype/misans/ \; && \
+    rm -rf /tmp/misans-extract && \
     fc-cache -f
 
 ### 安装 KasmVNC（提供 web VNC 访问）
