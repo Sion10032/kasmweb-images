@@ -2,6 +2,11 @@
 # 应用镜像基于此构建，只需提供 /dockerstartup/app_autostart.sh
 FROM debian:trixie-slim
 
+ARG VERSION=0.1.0
+ARG COMMIT=unknown
+LABEL org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${COMMIT}"
+
 ### 环境配置
 ARG LANG='en_US.UTF-8'
 ARG LC_ALL='en_US.UTF-8'

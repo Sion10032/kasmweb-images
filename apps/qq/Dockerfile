@@ -1,6 +1,11 @@
-# Linux QQ 应用镜像（基于 kasm-base 通用层）
-ARG BASE_IMAGE=sion10032/kasm-base:trixie
+# Linux QQ 应用镜像（基于 debian-trixie-core 通用层）
+ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.1.0
 FROM ${BASE_IMAGE}
+
+ARG VERSION=0.1.0
+ARG COMMIT=unknown
+LABEL org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${COMMIT}"
 
 USER root
 

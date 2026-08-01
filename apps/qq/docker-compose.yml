@@ -1,18 +1,19 @@
 services:
-  kasm-base:
+  linuxqq:
     build:
       context: .
       dockerfile: Dockerfile
-    image: sion10032/kasm-base:trixie
-    container_name: kasm-base
+    image: ghcr.io/sion10032/kasmweb/qq:latest
+    container_name: linuxqq
     ports:
-      # KasmVNC web 访问（https）
       - "6901:6901"
     environment:
       # KasmVNC web 登录密码
       - VNC_PW=password
       # 桌面分辨率
       - VNC_RESOLUTION=1280x720
-    # openbox + KasmVNC 调试用，1gb 足够
-    shm_size: '1gb'
+    volumes:
+      - ./data:/home/kasm-user
+    # Electron/QQ 需要较大共享内存
+    shm_size: '2gb'
     restart: unless-stopped
