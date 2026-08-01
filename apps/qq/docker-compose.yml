@@ -10,6 +10,8 @@ services:
     ports:
       - "6901:6901"
     environment:
+      # KasmVNC web 登录用户名（默认 kasm_user）
+      - VNC_USER=kasm_user
       # KasmVNC web 登录密码
       - VNC_PW=password
       # 桌面分辨率

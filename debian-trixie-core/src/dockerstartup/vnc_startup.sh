@@ -89,7 +89,7 @@ PASSWD_PATH="$HOME/.kasmpasswd"
 if [[ -f $PASSWD_PATH ]]; then
 	rm -f $PASSWD_PATH
 fi
-echo -e "${VNC_PW}\n${VNC_PW}\n" | kasmvncpasswd -u kasm_user -wo
+echo -e "${VNC_PW}\n${VNC_PW}\n" | kasmvncpasswd -u "${VNC_USER:-kasm_user}" -wo
 chmod 600 $PASSWD_PATH
 
 # source bashrc（含 generate_container_user）

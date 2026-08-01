@@ -21,6 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NO_VNC_PORT=6901 \
     VNC_PORT=5901 \
     VNC_PW=password \
+    VNC_USER=kasm_user \
     VNC_RESOLUTION=1280x720 \
     VNC_COL_DEPTH=24 \
     MAX_FRAME_RATE=24 \
