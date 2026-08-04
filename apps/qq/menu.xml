@@ -2,7 +2,7 @@
 <!-- Linux QQ 右键菜单 -->
 <openbox_menu xmlns="http://openbox.org/3.4/menu">
   <menu id="root-menu" label="Linux QQ">
-    <item label="启动 QQ">
+    <item label="QQ">
       <action name="Execute">
         <execute>/usr/local/bin/qq --no-sandbox</execute>
       </action>
