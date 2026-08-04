@@ -3,9 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # args:
-      #   APT_MIRROR: mirrors.ustc.edu.cn
-    image: ghcr.io/sion10032/kasmweb/firefox:latest
+      args:
+        # 本地开发联调：base 镜像用 dev tag
+        BASE_IMAGE: ghcr.io/sion10032/kasmweb/debian-trixie-core:dev
+        # APT_MIRROR: mirrors.ustc.edu.cn
+    image: ghcr.io/sion10032/kasmweb/firefox:dev
     container_name: firefox
     ports:
       - "6901:6901"
