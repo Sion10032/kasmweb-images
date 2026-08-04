@@ -1,0 +1,25 @@
+services:
+  wechat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # 本地开发联调：base 镜像用 dev tag
+        BASE_IMAGE: ghcr.io/sion10032/kasmweb/debian-trixie-core:dev
+        # APT_MIRROR: mirrors.ustc.edu.cn
+    image: ghcr.io/sion10032/kasmweb/wechat:dev
+    container_name: wechat
+    ports:
+      - "6901:6901"
+    environment:
+      # KasmVNC web 登录用户名（默认 kasm_user）
+      - VNC_USER=kasm_user
+      # KasmVNC web 登录密码
+      - VNC_PW=password
+      # 桌面分辨率
+      - VNC_RESOLUTION=1280x720
+    volumes:
+      - ./data:/home/kasm-user
+    # Electron/微信需要较大共享内存
+    shm_size: '2gb'
+    restart: unless-stopped
