@@ -1,201 +1,54 @@
 name: Docker
 
+# 入口 workflow：按 tag 前缀分发给可复用 workflow release-image.yml
+# 新增镜像只需在 jobs 中加一段（image / context / tag-prefix / changelog-paths / cache-scope）
 on:
   push:
     tags:
       - "debian-trixie-core-v*"
       - "qq-v*"
       - "firefox-v*"
-
-permissions:
-  contents: write
-  packages: write
-
-env:
-  REGISTRY: ghcr.io
-  BASE_IMAGE: ghcr.io/sion10032/kasmweb/debian-trixie-core
-  QQ_IMAGE: ghcr.io/sion10032/kasmweb/qq
-  FIREFOX_IMAGE: ghcr.io/sion10032/kasmweb/firefox
+      - "wechat-v*"
 
 jobs:
   debian-trixie-core:
     if: startsWith(github.ref_name, 'debian-trixie-core-')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Extract version
-        id: ver
-        run: echo "VERSION=${GITHUB_REF_NAME#debian-trixie-core-v}" >> "$GITHUB_OUTPUT"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Docker metadata (base)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.BASE_IMAGE }}
-          tags: |
-            type=raw,value=${{ steps.ver.outputs.VERSION }}
-            type=raw,value=latest
-      - name: Build and push base
-        uses: docker/build-push-action@v6
-        with:
-          context: ./debian-trixie-core
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ steps.ver.outputs.VERSION }}
-            COMMIT=${{ github.sha }}
-          cache-from: type=gha,scope=debian-trixie-core
-          cache-to: type=gha,scope=debian-trixie-core,mode=max
-
-      - name: Generate changelog
-        id: changelog
-        env:
-          # 含旧路径 base/：目录由 base/ 重命名而来，git log --path 不跟随重命名
-          CHANGELOG_PATHS: debian-trixie-core/ base/
-        run: |
-          PREV_TAG=$(git tag --list "debian-trixie-core-v*" --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -1)
-          RANGE="${PREV_TAG:+${PREV_TAG}..HEAD}"
-          {
-            echo "notes<<EOF"
-            echo "## Changes"
-            git log ${RANGE:-HEAD} --pretty=format:"- %s (%h)" -- ${CHANGELOG_PATHS}
-            echo ""
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.notes }}
+    uses: ./.github/workflows/release-image.yml
+    with:
+      image: ghcr.io/sion10032/kasmweb/debian-trixie-core
+      context: ./debian-trixie-core
+      tag-prefix: debian-trixie-core-v
+      # 含旧路径 base/：目录由 base/ 重命名而来，git log --path 不跟随重命名
+      changelog-paths: "debian-trixie-core/ base/"
+      cache-scope: debian-trixie-core
 
   qq:
     if: startsWith(github.ref_name, 'qq-')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Extract version
-        id: ver
-        run: echo "VERSION=${GITHUB_REF_NAME#qq-v}" >> "$GITHUB_OUTPUT"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Docker metadata (qq)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.QQ_IMAGE }}
-          tags: |
-            type=raw,value=${{ steps.ver.outputs.VERSION }}
-            type=raw,value=latest
-      - name: Build and push qq
-        uses: docker/build-push-action@v6
-        with:
-          context: ./apps/qq
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ steps.ver.outputs.VERSION }}
-            COMMIT=${{ github.sha }}
-          cache-from: type=gha,scope=qq
-          cache-to: type=gha,scope=qq,mode=max
-
-      - name: Generate changelog
-        id: changelog
-        env:
-          # 含旧路径 apps/linuxqq/：目录由 apps/linuxqq/ 重命名而来
-          CHANGELOG_PATHS: apps/qq/ apps/linuxqq/
-        run: |
-          PREV_TAG=$(git tag --list "qq-v*" --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -1)
-          RANGE="${PREV_TAG:+${PREV_TAG}..HEAD}"
-          {
-            echo "notes<<EOF"
-            echo "## Changes"
-            git log ${RANGE:-HEAD} --pretty=format:"- %s (%h)" -- ${CHANGELOG_PATHS}
-            echo ""
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.notes }}
+    uses: ./.github/workflows/release-image.yml
+    with:
+      image: ghcr.io/sion10032/kasmweb/qq
+      context: ./apps/qq
+      tag-prefix: qq-v
+      # 含旧路径 apps/linuxqq/：目录由 apps/linuxqq/ 重命名而来
+      changelog-paths: "apps/qq/ apps/linuxqq/"
+      cache-scope: qq
 
   firefox:
     if: startsWith(github.ref_name, 'firefox-')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Extract version
-        id: ver
-        run: echo "VERSION=${GITHUB_REF_NAME#firefox-v}" >> "$GITHUB_OUTPUT"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Docker metadata (firefox)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.FIREFOX_IMAGE }}
-          tags: |
-            type=raw,value=${{ steps.ver.outputs.VERSION }}
-            type=raw,value=latest
-      - name: Build and push firefox
-        uses: docker/build-push-action@v6
-        with:
-          context: ./apps/firefox
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ steps.ver.outputs.VERSION }}
-            COMMIT=${{ github.sha }}
-          cache-from: type=gha,scope=firefox
-          cache-to: type=gha,scope=firefox,mode=max
+    uses: ./.github/workflows/release-image.yml
+    with:
+      image: ghcr.io/sion10032/kasmweb/firefox
+      context: ./apps/firefox
+      tag-prefix: firefox-v
+      changelog-paths: "apps/firefox/"
+      cache-scope: firefox
 
-      - name: Generate changelog
-        id: changelog
-        env:
-          CHANGELOG_PATHS: apps/firefox/
-        run: |
-          PREV_TAG=$(git tag --list "firefox-v*" --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -1)
-          RANGE="${PREV_TAG:+${PREV_TAG}..HEAD}"
-          {
-            echo "notes<<EOF"
-            echo "## Changes"
-            git log ${RANGE:-HEAD} --pretty=format:"- %s (%h)" -- ${CHANGELOG_PATHS}
-            echo ""
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.notes }}
+  wechat:
+    if: startsWith(github.ref_name, 'wechat-')
+    uses: ./.github/workflows/release-image.yml
+    with:
+      image: ghcr.io/sion10032/kasmweb/wechat
+      context: ./apps/wechat
+      tag-prefix: wechat-v
+      changelog-paths: "apps/wechat/"
+      cache-scope: wechat
