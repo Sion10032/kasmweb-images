@@ -10,6 +10,10 @@ on:
       - "firefox-v*"
       - "wechat-v*"
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   debian-trixie-core:
     if: startsWith(github.ref_name, 'debian-trixie-core-')
