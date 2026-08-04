@@ -43,9 +43,9 @@ function start_kasmvnc (){
 		-websocketPort $NO_VNC_PORT \
 		-httpd ${KASM_VNC_PATH}/www \
 		-sslOnly \
-		-FrameRate=$MAX_FRAME_RATE \
+		-FrameRate $MAX_FRAME_RATE \
+		-BlacklistThreshold $VNC_BLACKLIST_THRESHOLD \
 		-interface 0.0.0.0 \
-		-BlacklistThreshold=0 \
 		$VNCOPTIONS
 
 	KASM_PROCS['kasmvnc']=$(cat $HOME/.vnc/*${DISPLAY_NUM}.pid 2>/dev/null)

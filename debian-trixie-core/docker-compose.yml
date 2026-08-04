@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       # args:
       #   APT_MIRROR: mirrors.ustc.edu.cn
-    image: ghcr.io/sion10032/kasmweb/debian-trixie-core:latest
+    image: ghcr.io/sion10032/kasmweb/debian-trixie-core:dev
     container_name: kasm-base
     ports:
       # KasmVNC web 访问（https）
