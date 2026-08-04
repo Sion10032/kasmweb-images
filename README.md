@@ -16,6 +16,7 @@
 | -------------------- | ----------------------------------------------------------------------------- |
 | `debian-trixie-core` | 通用基础镜像：Debian 13 trixie + KasmVNC + openbox + tint2 + MiSans/Noto 字体 |
 | `qq`                 | Linux QQ 桌面版，容器启动后自动打开 QQ                                        |
+| `firefox`            | Mozilla Firefox，已禁用遥测与自动更新，启动即用                               |
 
 镜像地址：`ghcr.io/sion10032/kasmweb/<镜像名>`，采用语义化版本号（当前 `0.1.0`），均有 `:latest` 标签。
 
@@ -100,10 +101,8 @@ kasmweb-images/
 │   ├── docker-compose.yml
 │   └── src/                 # KasmVNC 配置 / 启动脚本 / openbox+tint2 配置 / 字体
 ├── apps/
-│   └── qq/                  # Linux QQ 应用镜像
-│       ├── Dockerfile       # FROM debian-trixie-core
-│       ├── app_autostart.sh # 开机自启钩子（启动 QQ）
-│       └── ...
+│   ├── qq/                  # Linux QQ 应用镜像
+│   └── firefox/             # Mozilla Firefox 应用镜像
 └── .github/workflows/       # CI：GHCR 发版 + 自动 Release
 ```
 
@@ -130,3 +129,4 @@ kasmweb-images/
 - **MiSans** — SIL Open Font License，© Xiaomi
 - **Noto Color Emoji** — SIL Open Font License，© Google
 - **Linux QQ** — 闭源专有，© Tencent。本项目仅自动化安装腾讯官方安装包，不持有 QQ 的任何权利
+- **Mozilla Firefox** — MPL 2.0，© Mozilla Foundation。本项目仅自动化安装官方发行版，不持有 Firefox 的任何权利

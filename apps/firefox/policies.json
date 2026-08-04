@@ -1,0 +1,24 @@
+{
+  "policies": {
+    "DisableTelemetry": true,
+    "DisableAppUpdate": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DontCheckDefaultBrowser": true,
+    "CaptivePortal": false,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "DisableMasterPasswordCreation": false,
+    "DNSOverHTTPS": {
+      "Enabled": false
+    },
+    "EncryptedMediaExtensions": {
+      "Enabled": true
+    },
+    "PromptForDownloadLocation": false,
+    "OfferToSaveLogins": true,
+    "DisplayBookmarksToolbar": "never",
+    "NoDefaultBookmarks": true,
+    "SearchBar": "unified"
+  }
+}
