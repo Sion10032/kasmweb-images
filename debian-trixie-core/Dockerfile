@@ -29,7 +29,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LANG=$LANG \
     LANGUAGE=$LANG \
     LC_ALL=$LC_ALL \
-    TZ=$TZ
+    TZ=$TZ \
+    # 输入法（fcitx5）：GTK/Qt IM 模块接入 + 部署决策点
+    GTK_IM_MODULE=fcitx \
+    QT_IM_MODULE=fcitx \
+    XMODIFIERS=@im=fcitx \
+    DEPLOY_IME_SCRIPT=/opt/rime/deploy_rime_ice.sh
 
 WORKDIR /home/kasm-default-profile
 
@@ -93,11 +98,68 @@ RUN --mount=type=cache,target=/tmp/misans-cache \
     rm -rf /tmp/misans-extract && \
     fc-cache -f
 
-### 安装 KasmVNC（提供 web VNC 访问）
+### 输入法框架：fcitx5 + Rime 引擎（应用通用，放基础层）
+# 框架装系统层（不随用户目录/挂载卷丢失）；引擎方案数据由 DEPLOY_IME_SCRIPT 部署
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        fcitx5 \
+        fcitx5-rime \
+        fcitx5-frontend-all \
+        fcitx5-modules \
+        fcitx5-configtool \
+        librime-bin \
+        librime-plugin-lua \
+    && rm -rf /var/lib/apt/lists/*
+
+### 雾凇拼音（rime-ice）模板 + 部署脚本：打包到 /opt/rime，不预部署到任何用户目录
+# 官方 release full.zip（完整方案 + 词典，未编译），钉在 2026.06.30 tag，构建可复现
+# 出厂即已剔除 .github/build/others/README 等无关文件，解压直接就是模板
+# 用户 Rime 目录位于挂载卷内，模板随镜像层存活；启动时由 deploy_rime_ice.sh
+# 执行“缺失才补齐、已有不覆盖”，旧卷/新挂载卷都能获得雾凇且不动用户词库。
+# cache mount 缓存 zip：首次慢，后续构建命中缓存秒过
+RUN --mount=type=cache,target=/tmp/rime-cache \
+    mkdir -p /tmp/rime-extract /opt/rime/rime-ice && \
+    if [ ! -s /tmp/rime-cache/full.zip ] || ! unzip -tq /tmp/rime-cache/full.zip >/dev/null 2>&1; then \
+      curl -fL --http1.1 --retry 5 --retry-delay 5 --retry-all-errors \
+        "https://github.com/iDvel/rime-ice/releases/download/2026.06.30/full.zip" \
+        -o /tmp/rime-cache/full.zip; \
+    fi && \
+    unzip -q /tmp/rime-cache/full.zip -d /tmp/rime-extract && \
+    cp -r /tmp/rime-extract/. /opt/rime/rime-ice/ && \
+    rm -rf /tmp/rime-extract
+
+# 部署脚本 + fcitx5 配置模板（源码在 src/rime/，随镜像层打包）
+COPY src/rime/deploy_rime_ice.sh /opt/rime/deploy_rime_ice.sh
+COPY src/rime/fcitx5/ /opt/rime/fcitx5/
+RUN chmod +x /opt/rime/deploy_rime_ice.sh
+
+### 安装 KasmVNC（提供 web VNC 访问；cache mount 缓存 deb，一次 RUN 内下载+安装）
+# TARGETARCH 由 buildx 注入（amd64/arm64）；非 buildx 构建回退 uname 推断
+# deb 首次拉取后永久缓存，后续构建秒过；cache mount 不进镜像层
 # 先装 deb 再覆盖 kasmvnc.yaml：该文件是 dpkg conffile，
 # 若安装前已存在会触发交互式 conffile 冲突导致非交互 build 失败
-COPY src/install_kasmvnc.sh /tmp/install_kasmvnc.sh
-RUN bash /tmp/install_kasmvnc.sh && rm /tmp/install_kasmvnc.sh
+ARG TARGETARCH
+RUN --mount=type=cache,target=/tmp/kasmvnc-cache \
+    set -e && \
+    ARCH_PKG="${TARGETARCH:-$(case "$(uname -m)" in aarch64) echo arm64 ;; *) echo amd64 ;; esac)}" && \
+    DEB="/tmp/kasmvnc-cache/kasmvncserver_${ARCH_PKG}.deb" && \
+    echo "KasmVNC arch: ${ARCH_PKG}" && \
+    if [ ! -s "$DEB" ]; then \
+      curl -fL --http1.1 --retry 5 --retry-delay 5 --retry-all-errors \
+        "https://kasmweb-build-artifacts.s3.amazonaws.com/kasmvnc/17265facc40ab50db5740cdf0d12c61173edafc9/kasmvncserver_trixie_1.5.0_${ARCH_PKG}.deb" \
+        -o "$DEB"; \
+    fi && \
+    apt-get update && \
+    apt-get install -y gettext ssl-cert libxfont2 && \
+    apt-get install -y "$DEB" && \
+    mkdir -p ${KASM_VNC_PATH}/www/Downloads && \
+    chown -R 0:0 ${KASM_VNC_PATH} && \
+    chmod -R og-w ${KASM_VNC_PATH} && \
+    ln -sf /home/kasm-user/Downloads ${KASM_VNC_PATH}/www/Downloads/Downloads && \
+    chown -R 1000:0 ${KASM_VNC_PATH}/www/Downloads && \
+    rm -rf /var/lib/apt/lists/*
+
+# KasmVNC 安装完成后覆盖配置（conffile 若提前存在会触发交互式冲突）
 COPY src/kasmvnc.yaml /etc/kasmvnc/kasmvnc.yaml
 
 ### 启动脚本

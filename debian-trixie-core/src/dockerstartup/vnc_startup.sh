@@ -13,8 +13,8 @@ log () {
 
 no_proxy="localhost,127.0.0.1"
 
-# Dbus
-export $(dbus-launch)
+# Start DBus session
+eval "$(dbus-launch --sh-syntax)"
 
 # dict to store processes
 declare -A KASM_PROCS
@@ -61,6 +61,15 @@ function start_window_manager (){
 	KASM_PROCS['window_manager']=$!
 }
 
+function start_fcitx (){
+    # 输入法框架：fcitx5 随桌面启动（Rime 数据由 DEPLOY_IME_SCRIPT 在 entrypoint 部署）
+    # 应用镜像不需要输入法时：覆盖 /dockerstartup/ime_autostart.sh 或置空 DEPLOY_IME_SCRIPT
+    # 先于 tint2 启动，托盘渲染时即可拾取 fcitx5 状态图标
+    if [ -x /dockerstartup/ime_autostart.sh ]; then
+        /dockerstartup/ime_autostart.sh
+    fi
+}
+
 function custom_startup (){
 	custom_startup_script=/dockerstartup/custom_startup.sh
 	if [ -f "$custom_startup_script" ]; then
@@ -99,6 +108,7 @@ fi
 
 # 启动进程
 start_kasmvnc
+start_fcitx
 start_window_manager
 
 log "KasmVNC environment started"

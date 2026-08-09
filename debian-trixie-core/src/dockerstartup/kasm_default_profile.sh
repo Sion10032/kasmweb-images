@@ -18,6 +18,13 @@ fi
 # 创建常用目录
 mkdir -p $HOME/Downloads
 
+# 输入法部署钩子：DEPLOY_IME_SCRIPT 非空且可执行才执行（默认部署雾凇拼音模板）
+# 置空 = 不部署；指向自定义脚本 = 部署其他输入法。失败静默跳过不阻塞启动
+if [ -n "${DEPLOY_IME_SCRIPT:-}" ] && [ -x "$DEPLOY_IME_SCRIPT" ]; then
+    echo "Executing IME deploy script: ${DEPLOY_IME_SCRIPT}"
+    "$DEPLOY_IME_SCRIPT" || true
+fi
+
 echo -e "\n\n------------------ EXECUTE COMMAND ------------------"
 echo "Executing command: '$@'"
 exec "$@"

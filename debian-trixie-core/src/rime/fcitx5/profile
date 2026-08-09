@@ -1,0 +1,17 @@
+# fcitx5 输入法列表（默认组）：en 键盘 + Rime 引擎（scheme 由 rime-ice 的 default.yaml 指定，雾凇全拼）
+# 键名依据 fcitx5 源码 inputmethodconfig_p.h / inputmethodmanager.cpp 的 INI 序列化规则：
+#   groups -> [Groups/N]，items -> [Groups/N/Items/M]，defaultLayout -> "Default Layout"，defaultInputMethod -> "DefaultIM"
+# 注意：组缺少 "Default Layout" 会被 fcitx5 跳过（必须保留）；DefaultIM=rime 使启动即中文输入，
+#       Ctrl+Space 切换中/英。
+[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=rime
+
+[Groups/0/Items/0]
+Name=keyboard-us
+Layout=
+
+[Groups/0/Items/1]
+Name=rime
+Layout=

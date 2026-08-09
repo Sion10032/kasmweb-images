@@ -16,6 +16,8 @@ tint2 2>/dev/null &
 xset s off 2>/dev/null
 xset -dpms 2>/dev/null
 
+sleep 0.2
+
 # 应用自启钩子：应用镜像提供 /dockerstartup/app_autostart.sh
 # 若存在则启动应用，否则启动一个 xterm 作为占位
 if [ -x /dockerstartup/app_autostart.sh ]; then
