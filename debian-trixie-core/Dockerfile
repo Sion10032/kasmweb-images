@@ -57,6 +57,8 @@ RUN apt-get update && \
         openssl \
         dbus-x11 \
         sudo \
+        nano \
+        vim-tiny \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
@@ -69,6 +71,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         icewm \
         lxterminal \
+        l3afpad \
         x11-xserver-utils \
         xclip \
         xauth \
