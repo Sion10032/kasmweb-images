@@ -1,5 +1,5 @@
 # 微信应用镜像（基于 debian-trixie-core 通用层）
-ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.1.1
+ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.2.0
 FROM ${BASE_IMAGE}
 
 ARG VERSION=dev
@@ -34,11 +34,8 @@ RUN apt-get update && \
         libxcb-keysyms1 && \
     rm -rf /var/lib/apt/lists/*
 
-### 应用自启钩子（openbox 开机调用）
+### 应用自启钩子（icewm 开机调用）
 COPY app_autostart.sh /dockerstartup/app_autostart.sh
 RUN chmod +x /dockerstartup/app_autostart.sh
-
-### 覆盖右键菜单（加入「启动微信」）
-COPY menu.xml /etc/xdg/openbox/menu.xml
 
 USER 1000
