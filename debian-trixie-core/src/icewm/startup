@@ -1,5 +1,6 @@
 #!/bin/sh
-# Openbox 自启脚本：桌面环境启动后由 openbox-session 调用
+# IceWM 自启脚本：icewm-session 启动时 exec 执行（须可执行 + shebang 正确）
+# 任务栏 / 系统托盘 / 时钟 / 开始菜单由 icewm 内置承担，无需 tint2
 
 # 双向同步 PRIMARY <-> CLIPBOARD，使剪贴板在 VNC 内外同步
 # （xterm 用 PRIMARY，Qt/GTK 应用如 QQ 用 CLIPBOARD，需要桥接）
@@ -7,21 +8,12 @@ autocutsel -fork
 # 同步 CLIPBOARD 到 PRIMARY
 autocutsel -selection PRIMARY -fork
 
-# 轻量 topbar：任务栏 + 系统托盘（QQ 最小化恢复）+ 时钟
-# tint2 原生支持 XEmbed 与 SNI 两种托盘协议，无需 snixembed
-# （trixie 仓库无 snixembed 包，sid 才有）
-tint2 2>/dev/null &
-
 # 关闭屏保与 DPMS
 xset s off 2>/dev/null
 xset -dpms 2>/dev/null
 
-sleep 0.2
-
 # 应用自启钩子：应用镜像提供 /dockerstartup/app_autostart.sh
-# 若存在则启动应用，否则启动一个 xterm 作为占位
+# 若存在则启动应用，否则启动一个 terminal 作为占位
 if [ -x /dockerstartup/app_autostart.sh ]; then
     /dockerstartup/app_autostart.sh &
-else
-    xterm &
 fi

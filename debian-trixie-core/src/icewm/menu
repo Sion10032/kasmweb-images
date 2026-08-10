@@ -1,0 +1,4 @@
+# IceWM 开始菜单（/etc/X11/icewm/menu）
+prog Terminal ! lxterminal
+includeprog icewm-menu-fdo --seps -d1400 -D1650 -S --limit-max-len=42
+menuprog Monitors ../devices/computer icewm-menu-xrandr

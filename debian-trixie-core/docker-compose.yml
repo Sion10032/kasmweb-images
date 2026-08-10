@@ -19,6 +19,5 @@ services:
       - VNC_RESOLUTION=1280x720
     volumes:
       - ./data:/home/kasm-user
-    # openbox + KasmVNC 调试用，1gb 足够
     shm_size: '1gb'
     restart: unless-stopped

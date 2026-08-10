@@ -1,0 +1,4 @@
+# IceWM 主题选择文件（/etc/X11/icewm/theme）
+# icewm 启动时读取配置目录下的 theme 文件确定当前主题（非 preferences 的 key）。
+# 值为主题路径，相对 LIBDIR(/usr/share/icewm)；用户级 $HOME/.icewm/theme 优先级更高。
+Theme="arc-dark"

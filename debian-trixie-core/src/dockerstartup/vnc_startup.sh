@@ -56,15 +56,13 @@ function start_kasmvnc (){
 }
 
 function start_window_manager (){
-	echo -e "\n------------------ Openbox window manager startup ------------------"
-	/usr/bin/openbox-session &
+	echo -e "\n------------------ IceWM window manager startup ------------------"
+	/usr/bin/icewm-session &
 	KASM_PROCS['window_manager']=$!
 }
 
 function start_fcitx (){
-    # 输入法框架：fcitx5 随桌面启动（Rime 数据由 DEPLOY_IME_SCRIPT 在 entrypoint 部署）
     # 应用镜像不需要输入法时：覆盖 /dockerstartup/ime_autostart.sh 或置空 DEPLOY_IME_SCRIPT
-    # 先于 tint2 启动，托盘渲染时即可拾取 fcitx5 状态图标
     if [ -x /dockerstartup/ime_autostart.sh ]; then
         /dockerstartup/ime_autostart.sh
     fi
@@ -119,7 +117,7 @@ tail -f $HOME/.vnc/*$DISPLAY.log &
 # 可选的自定义启动钩子
 custom_startup
 
-# 监控进程：VNC/openbox 崩溃自动重启；应用崩溃由 openbox 桌面承托
+# 监控进程：VNC/icewm 崩溃自动重启；应用崩溃由 icewm 桌面承托
 sleep 3
 while :
 do

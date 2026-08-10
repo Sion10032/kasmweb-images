@@ -1,0 +1,29 @@
+# IceWM 系统级偏好（/etc/X11/icewm/preferences）
+# 仅覆盖 debian-trixie-core 需要的项，其余沿用 /usr/share/icewm/preferences 默认。
+# icewm 配置叠加优先级：用户级 $HOME/.icewm > /etc/X11/icewm > /usr/share/icewm
+# 任务栏 / 系统托盘 / 时钟 / 开始菜单默认即开启，无需在此声明。
+
+# 单工作区（对等原 openbox rc.xml: numWorkspaces=1；icewm 工作区数 = WorkspaceNames 项数）
+WorkspaceNames=" 1 "
+
+TaskBarAtTop=1
+TaskBarKeepBelow=1
+TaskBarAutoHide=1
+TaskBarFullscreenAutoShow=0
+
+TaskBarShowAPMAuto=0
+TaskBarShowAPMTime=0
+TaskBarShowAPMGraph=0
+TaskBarShowWorkspaces=0
+TaskBarShowWindowListMenu=0
+TaskBarShowCPUStatus=0
+CPUStatusShowRamUsage=0
+CPUStatusShowSwapUsage=0
+CPUStatusShowAcpiTemp=0
+CPUStatusShowCpuFreq=0
+TaskBarShowMEMStatus=0
+TaskBarShowNetStatus=0
+
+TimeFormat="%H:%M:%S"
+
+DesktopBackgroundColor="rgb:10/10/10"
