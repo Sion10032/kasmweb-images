@@ -1,5 +1,5 @@
 # Firefox 应用镜像（基于 debian-trixie-core 通用层）
-ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.2.0
+ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.2.1
 FROM ${BASE_IMAGE}
 
 ARG VERSION=dev
