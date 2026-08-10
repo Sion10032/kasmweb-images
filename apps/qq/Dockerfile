@@ -1,5 +1,5 @@
 # Linux QQ 应用镜像（基于 debian-trixie-core 通用层）
-ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.1.1
+ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.2.0
 FROM ${BASE_IMAGE}
 
 ARG VERSION=dev
@@ -27,11 +27,13 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends libasound2t64 && \
     rm -rf /var/lib/apt/lists/*
 
-### 应用自启钩子（openbox 开机调用）
+### 应用自启钩子（icewm 开机调用）
 COPY app_autostart.sh /dockerstartup/app_autostart.sh
 RUN chmod +x /dockerstartup/app_autostart.sh
 
-### 覆盖右键菜单（加入「启动 QQ」）
-COPY menu.xml /etc/xdg/openbox/menu.xml
+### IceWM：禁用 Firefox 窗口装饰（去标题栏/边框）+ 启动即最大化 + 置顶
+# 对等原 openbox rc.xml <application class="firefox">；改用 icewm winoptions
+# 按 WM_CLASS class 匹配（firefox），字段语义见 https://ice-wm.org/man/icewm-winoptions
+COPY winoptions /etc/X11/icewm/winoptions
 
 USER 1000
