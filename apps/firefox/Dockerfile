@@ -1,5 +1,5 @@
 # Firefox 应用镜像（基于 debian-trixie-core 通用层）
-ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.1.1
+ARG BASE_IMAGE=ghcr.io/sion10032/kasmweb/debian-trixie-core:0.2.0
 FROM ${BASE_IMAGE}
 
 ARG VERSION=dev
@@ -23,19 +23,13 @@ RUN bash /tmp/install_firefox.sh && rm /tmp/install_firefox.sh && rm -rf /var/li
 ### Enterprise Policies：禁用遥测与自动更新（系统级，所有 profile 生效）
 COPY policies.json /etc/firefox/policies/policies.json
 
-### 应用自启钩子（openbox 开机调用）
+### 应用自启钩子（icewm 开机调用）
 COPY app_autostart.sh /dockerstartup/app_autostart.sh
 RUN chmod +x /dockerstartup/app_autostart.sh
 
-### 覆盖右键菜单（加入「启动 Firefox」）
-COPY menu.xml /etc/xdg/openbox/menu.xml
-
-### Openbox：禁用 Firefox 系统窗口装饰（去掉标题栏/边框）+ 启动即最大化
-# openbox 下 Firefox 不使用客户端装饰（CSD），改为由 openbox 对 Firefox 窗口
-# 关闭 decor 并最大化，获得更干净的无边框全屏外观（单应用容器场景更合适）
-# 注意：WM_CLASS 的 class 字段是小写 "firefox"，openbox 匹配大小写敏感
-RUN sed -i '/<\/applications>/i \
-  <application class="firefox">\n    <layer>above</layer>\n    <decor>no</decor>\n    <maximized>true</maximized>\n  </application>' \
-    /etc/xdg/openbox/rc.xml
+### IceWM：禁用 Firefox 窗口装饰（去标题栏/边框）+ 启动即最大化 + 置顶
+# 对等原 openbox rc.xml <application class="firefox">；改用 icewm winoptions
+# 按 WM_CLASS class 匹配（firefox），字段语义见 https://ice-wm.org/man/icewm-winoptions
+COPY winoptions /etc/X11/icewm/winoptions
 
 USER 1000

@@ -17,7 +17,6 @@
     },
     "PromptForDownloadLocation": false,
     "OfferToSaveLogins": true,
-    "DisplayBookmarksToolbar": "never",
     "NoDefaultBookmarks": true,
     "SearchBar": "unified"
   }
