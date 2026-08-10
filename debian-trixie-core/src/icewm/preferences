@@ -27,3 +27,5 @@ TaskBarShowNetStatus=0
 TimeFormat="%H:%M:%S"
 
 DesktopBackgroundColor="rgb:10/10/10"
+
+HideBordersMaximized=1

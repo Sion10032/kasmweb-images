@@ -166,20 +166,19 @@ COPY src/dockerstartup/ /dockerstartup/
 RUN chmod +x /dockerstartup/*.sh /dockerstartup/generate_container_user
 
 ### IceWM 配置（系统级，覆盖 /usr/share/icewm 默认；用户级 $HOME/.icewm 进一步覆盖）
+COPY src/icewm/arc-dark/ /usr/share/icewm/themes/arc-dark/
 COPY src/icewm/preferences /etc/X11/icewm/preferences
 COPY src/icewm/menu /etc/X11/icewm/menu
 # 内置 Arc-Dark 主题并设为默认（theme 选择文件路径相对 /usr/share/icewm）
-COPY src/icewm/arc-dark/ /usr/share/icewm/themes/arc-dark/
 COPY src/icewm/theme /etc/X11/icewm/theme
 COPY src/icewm/toolbar /etc/X11/icewm/toolbar
 COPY src/icewm/keys /etc/X11/icewm/keys
+COPY src/icewm/startup /etc/X11/icewm/startup
+RUN chmod +x /etc/X11/icewm/startup
 
 ### 默认用户 profile（首次启动复制到运行期 HOME）
-RUN mkdir -p /home/kasm-default-profile/.icewm && \
+RUN mkdir -p /home/kasm-default-profile && \
     echo 'source $STARTUPDIR/generate_container_user' >> /home/kasm-default-profile/.bashrc
-# IceWM 用户级自启脚本（icewm-session 用 execve 执行 ~/.icewm/startup，须可执行）
-COPY src/icewm/startup /home/kasm-default-profile/.icewm/startup
-RUN chmod +x /home/kasm-default-profile/.icewm/startup
 
 ### 创建运行期用户 kasm-user (uid 1000)
 RUN groupadd -g 1000 kasm-user && \

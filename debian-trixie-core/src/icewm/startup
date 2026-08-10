@@ -2,12 +2,6 @@
 # IceWM 自启脚本：icewm-session 启动时 exec 执行（须可执行 + shebang 正确）
 # 任务栏 / 系统托盘 / 时钟 / 开始菜单由 icewm 内置承担，无需 tint2
 
-# 双向同步 PRIMARY <-> CLIPBOARD，使剪贴板在 VNC 内外同步
-# （xterm 用 PRIMARY，Qt/GTK 应用如 QQ 用 CLIPBOARD，需要桥接）
-autocutsel -fork
-# 同步 CLIPBOARD 到 PRIMARY
-autocutsel -selection PRIMARY -fork
-
 # 关闭屏保与 DPMS
 xset s off 2>/dev/null
 xset -dpms 2>/dev/null
@@ -17,3 +11,16 @@ xset -dpms 2>/dev/null
 if [ -x /dockerstartup/app_autostart.sh ]; then
     /dockerstartup/app_autostart.sh &
 fi
+
+# 监听屏幕分辨率变化（KasmVNC Remote Resizing），对所有窗口 moveby 触发重新适配
+(
+    last=""
+    while true; do
+        cur=$(xrandr --current 2>/dev/null | sed -nr 's/.*current ([0-9]+) x ([0-9]+).*/\1x\2/p' | head -1)
+        if [ -n "$cur" ] && [ "$cur" != "$last" ]; then
+            [ -n "$last" ] && pgrep -x icewm >/dev/null && icesh -a moveby 0 0 2>/dev/null
+            last="$cur"
+        fi
+        sleep 0.5
+    done
+) &
